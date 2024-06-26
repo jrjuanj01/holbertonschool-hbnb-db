@@ -1,4 +1,6 @@
-flask
-flask-cors
-
-gunicorn
+Flask==3.0.3
+Flask-cors
+Flask-JWT-Extended
+Flask_sqlalchemy
+Gunicorn==20.1.0
+SQLAlchemy==2.0.0
