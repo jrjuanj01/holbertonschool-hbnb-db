@@ -2,10 +2,13 @@
 Place related functionality
 """
 
+import uuid
 from src.models.base import Base
 from src.models.city import City
 from src.models.user import User
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 
 class Place(Base):
     """Place representation"""
@@ -21,7 +24,24 @@ class Place(Base):
     number_of_rooms: int
     number_of_bathrooms: int
     max_guests: int
+    
+    __tablename__ = "Places"
 
+    id = db.Column(db.String(36), primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(420), nullable=False)
+    address = db.Column(db.String(420), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    city_id = db.Column(db.String(36), db.ForeignKey("city.id"), nullable=False)
+    host_id = db.Column(db.String(36), db.ForeignKey("user.id"), nullable=False)
+    price_per_night = db.Column(db.Integer(), nullable=False)
+    number_of_rooms = db.Column(db.Integer(), nullable=False)
+    number_of_bathrooms = db.Column(db.Integer(), nullable=False)
+    max_guests = db.Column(db.Integer(), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
+    
     def __init__(self, data: dict | None = None, **kw) -> None:
         """Dummy init"""
         super().__init__(**kw)

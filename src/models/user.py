@@ -2,6 +2,7 @@
 User related functionality
 """
 
+import uuid
 from src.models.base import Base
 from flask_sqlalchemy import SQLAlchemy
 
@@ -18,7 +19,8 @@ class User(Base, db.Model):
     
     id = db.Column(db.String(36), primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    first_name = db.Column()
+    first_name = db.Column(db.String(120), nullable=False)
+    last_name = db.Column(db.String(120), nullable=False)
     password = db.Column(db.String(128), nullable=False)  # Ensure secure storage
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
@@ -27,6 +29,7 @@ class User(Base, db.Model):
     def __init__(self, email: str, first_name: str, last_name: str, **kw):
         """Dummy init"""
         super().__init__(**kw)
+
         self.email = email
         self.first_name = first_name
         self.last_name = last_name

@@ -1,7 +1,9 @@
 """
 Country related functionality
 """
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 
 class Country:
     """
@@ -16,6 +18,12 @@ class Country:
     code: str
     cities: list
 
+    __tablename__ = "country"
+    
+    name = db.Column(db.String(256), unique=True, nullable=False)
+    code = db.Column(db.String(2), primary_key=True, nullable=False)
+    cities = db.Column(db.String(1024), unique=True, nullable=False)
+    
     def __init__(self, name: str, code: str, **kw) -> None:
         """Dummy init"""
         super().__init__(**kw)

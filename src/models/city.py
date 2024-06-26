@@ -4,7 +4,9 @@ City related functionality
 
 from src.models.base import Base
 from src.models.country import Country
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 
 class City(Base):
     """City representation"""
@@ -12,6 +14,14 @@ class City(Base):
     name: str
     country_code: str
 
+    __tablename__ = "Cities"
+    
+    id = db.Column(db.String(36), primary_key=True)
+    name = db.Column(db.String(256), nullable=False)
+    country_code = db.Column(db.String(2), db.ForeignKey("country.code"), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
+    
     def __init__(self, name: str, country_code: str, **kw) -> None:
         """Dummy init"""
         super().__init__(**kw)
