@@ -1,8 +1,11 @@
 """ Initialize the Flask app. """
 
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt as bcrypt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from src.models.user import User
 
 cors = CORS()
 
@@ -50,23 +53,22 @@ def register_routes(app: Flask) -> None:
     app.register_blueprint(places_bp)
     app.register_blueprint(reviews_bp)
     app.register_blueprint(amenities_bp)
-
-    from flask_bcrypt import Bcrypt
-    from flask_jwt_extended import create_access_token
-    from flask import request, jsonify
-    from src.models.user import User
     
-    bcrypt = Bcrypt(app)
-    
-    app.route('/login', methods=['POST'])
+    @app.route('/login', methods=['POST'])
     def login():
-        username = request.json.get('username', None)
+        email = request.json.get('email', None)
         password = request.json.get('password', None)
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            access_token = create_access_token(identity=username)
+            access_token = create_access_token(identity=email)
             return jsonify(access_token=access_token), 200
 
+    @app.route('/protected', methods=['GET'])
+    @jwt_required()
+    def protected():
+        current_user = get_jwt_identity()
+        return jsonify(logged_in_as=current_user), 200
+    
 def register_handlers(app: Flask) -> None:
     """Register the error handlers for the Flask app."""
     app.errorhandler(404)(lambda e: (
@@ -79,4 +81,4 @@ def register_handlers(app: Flask) -> None:
         )
     )
 
-    return 'Wrong username or password', 401
+    return 'Wrong email or password', 401

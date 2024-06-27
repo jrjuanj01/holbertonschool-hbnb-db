@@ -4,9 +4,9 @@ User related functionality
 
 import uuid
 from src.models.base import Base
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy as db
+from flask_bcrypt import Bcrypt as bcrypt
 
-db = SQLAlchemy()
 
 class User(Base, db.Model):
     """User representation"""
@@ -21,7 +21,7 @@ class User(Base, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     first_name = db.Column(db.String(120), nullable=False)
     last_name = db.Column(db.String(120), nullable=False)
-    password = db.Column(db.String(128), nullable=False)  # Ensure secure storage
+    password_hash = db.Column(db.String(128), nullable=False)  # Ensure secure storage
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
@@ -48,6 +48,12 @@ class User(Base, db.Model):
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }
+        
+    def set_password(self, password):
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        
+    def check_password(self, password: str):
+        return bcrypt.check_password_hash(self.password_hash, password)
 
     @staticmethod
     def create(user: dict) -> "User":
