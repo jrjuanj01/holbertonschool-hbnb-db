@@ -51,6 +51,21 @@ def register_routes(app: Flask) -> None:
     app.register_blueprint(reviews_bp)
     app.register_blueprint(amenities_bp)
 
+    from flask_bcrypt import Bcrypt
+    from flask_jwt_extended import create_access_token
+    from flask import request, jsonify
+    from src.models.user import User
+    
+    bcrypt = Bcrypt(app)
+    
+    app.route('/login', methods=['POST'])
+    def login():
+        username = request.json.get('username', None)
+        password = request.json.get('password', None)
+        user = User.query.filter_by(username=username).first()
+        if user and bcrypt.check_password_hash(user.password, password):
+            access_token = create_access_token(identity=username)
+            return jsonify(access_token=access_token), 200
 
 def register_handlers(app: Flask) -> None:
     """Register the error handlers for the Flask app."""
@@ -63,3 +78,5 @@ def register_handlers(app: Flask) -> None:
             {"error": "Bad request", "message": str(e)}, 400
         )
     )
+
+    return 'Wrong username or password', 401
