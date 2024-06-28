@@ -61,7 +61,7 @@ def get_review_by_id(review_id: str):
 def update_review(review_id: str):
     """Updates a review by ID"""
     data = request.get_json()
-
+    
     try:
         review: Review | None = Review.update(review_id, data)
     except ValueError as e:

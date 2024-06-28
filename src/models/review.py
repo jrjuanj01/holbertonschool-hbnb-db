@@ -69,6 +69,9 @@ class Review(Base):
         if not place:
             raise ValueError(f"Place with ID {data['place_id']} not found")
 
+        if data.user_id == place.host_id:
+            raise ValueError("Cannot review own place")
+        
         new_review = Review(**data)
 
         repo.save(new_review)
@@ -84,6 +87,9 @@ class Review(Base):
 
         if not review:
             raise ValueError("Review not found")
+    
+        if data.user_id != review.user_id:       #Checks if og poster is the new poster
+            raise ValueError("Review cannot be edited by a different poster")
 
         for key, value in data.items():
             setattr(review, key, value)

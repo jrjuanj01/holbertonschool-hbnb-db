@@ -115,6 +115,9 @@ class Place(Base):
         if not place:
             return None
 
+        if data.user_id != place.host_id:
+            raise ValueError("Cannot update place details for other users")
+        
         for key, value in data.items():
             setattr(place, key, value)
 
