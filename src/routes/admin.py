@@ -1,9 +1,9 @@
 from flask import Blueprint, abort, jsonify
 from flask_jwt_extended import jwt_required, get_jwt
-from controllers.amenities import create_amenity, update_amenity, delete_amenity
-from controllers.cities import create_city, update_city, delete_city
-from controllers.places import create_place, delete_place, update_place
-from controllers.users import create_user, update_user, delete_user
+from src.controllers.amenities import create_amenity, update_amenity, delete_amenity
+from src.controllers.cities import create_city, update_city, delete_city
+from src.controllers.places import create_place, delete_place, update_place
+from src.controllers.users import create_user, update_user, delete_user
 
 admin_bp = Blueprint('admin', __name__)
 

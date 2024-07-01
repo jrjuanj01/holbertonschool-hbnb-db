@@ -23,4 +23,4 @@ reviews_bp.route("/reviews", methods=["GET"])(get_reviews)
 
 reviews_bp.route("/reviews/<review_id>", methods=["GET"])(get_review_by_id)
 reviews_bp.route("/reviews/<review_id>", methods=["PUT"])(update_review)
-reviews_bp.route("/reviews/<review_id>", methods=["DELETE"])(delete_review)
+# reviews_bp.route("/reviews/<review_id>", methods=["DELETE"])(delete_review)

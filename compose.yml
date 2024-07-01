@@ -1,0 +1,22 @@
+version : '3.9'
+
+services:
+  web:
+    image: hbnb:latest
+    build: .
+    container_name: hbnb_app
+    environment:
+      - DATABASE_URL=MySQL:///hbnb_db
+    ports:
+      - "5000:5000"
+    volumes:
+      - hbnb_data:/app/data
+    networks:
+      - hbnb_network
+
+networks:
+  hbnb_network:
+    driver: bridge
+
+volumes:
+  hbnb_data:
