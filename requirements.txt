@@ -3,6 +3,8 @@ Flask-cors
 Flask-JWT-Extended
 Flask_sqlalchemy
 Flask_bcrypt
+SQLAlchemy
 Gunicorn==20.1.0
 MySQL
 Alembic
+python-dotenv==1.0.1

@@ -1,9 +1,10 @@
 """
 Country related functionality
 """
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, String
+from src.persistence.db import DBRepository
 
-db = SQLAlchemy()
+db = DBRepository
 
 class Country:
     """
@@ -20,9 +21,9 @@ class Country:
 
     __tablename__ = "country"
     
-    name = db.Column(db.String(256), unique=True, nullable=False)
-    code = db.Column(db.String(2), primary_key=True, nullable=False)
-    cities = db.Column(db.String(1024), unique=True, nullable=False)
+    name = Column(String(256), unique=True, nullable=False)
+    code = Column(String(2), primary_key=True, nullable=False)
+    cities = Column(String(1024), unique=True, nullable=False)
     
     def __init__(self, name: str, code: str, **kw) -> None:
         """Dummy init"""

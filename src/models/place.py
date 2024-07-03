@@ -2,15 +2,19 @@
 Place related functionality
 """
 
-import uuid
+import uuid, os
 from src.models.base import Base
 from src.models.city import City
 from src.models.user import User
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, String, Float, DateTime, func, ForeignKey, Integer
 
-db = SQLAlchemy()
+if os.getenv("REPOSITORY_ENV_VAR") == "db":
+    from src.persistence.db import DBRepository
+    repo = DBRepository
+else:
+    repo = Base
 
-class Place(Base):
+class Place(repo):
     """Place representation"""
 
     name: str
@@ -27,20 +31,20 @@ class Place(Base):
     
     __tablename__ = "Places"
 
-    id = db.Column(db.String(36), primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(420), nullable=False)
-    address = db.Column(db.String(420), nullable=False)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
-    city_id = db.Column(db.String(36), db.ForeignKey("city.id"), nullable=False)
-    host_id = db.Column(db.String(36), db.ForeignKey("user.id"), nullable=False)
-    price_per_night = db.Column(db.Integer(), nullable=False)
-    number_of_rooms = db.Column(db.Integer(), nullable=False)
-    number_of_bathrooms = db.Column(db.Integer(), nullable=False)
-    max_guests = db.Column(db.Integer(), nullable=False)
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
+    id = Column(String(36), primary_key=True)
+    name = Column(String(255), nullable=False)
+    description = Column(String(420), nullable=False)
+    address = Column(String(420), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    city_id = Column(String(36), ForeignKey("city.id"), nullable=False)
+    host_id = Column(String(36), ForeignKey("user.id"), nullable=False)
+    price_per_night = Column(Integer(), nullable=False)
+    number_of_rooms = Column(Integer(), nullable=False)
+    number_of_bathrooms = Column(Integer(), nullable=False)
+    max_guests = Column(Integer(), nullable=False)
+    created_at = Column(DateTime, default=func.current_timestamp())
+    updated_at = Column(DateTime, onupdate=func.current_timestamp())
     
     def __init__(self, data: dict | None = None, **kw) -> None:
         """Dummy init"""

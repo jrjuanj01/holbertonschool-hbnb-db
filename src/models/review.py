@@ -1,13 +1,17 @@
 """
 Review related functionality
 """
-import uuid
+import uuid, os
 from src.models.base import Base
 from src.models.place import Place
 from src.models.user import User
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, String, DateTime, Float, ForeignKey, func
 
-db = SQLAlchemy()
+if os.getenv("REPOSITORY_ENV_VAR") == "db":
+    from src.persistence.db import DBRepository
+    repo = DBRepository
+else:
+    repo = Base
 
 class Review(Base):
     """Review representation"""
@@ -19,13 +23,13 @@ class Review(Base):
     
     __tablename__ = "Reviews"
     
-    id = db.Column(db.String(36), primary_key=True)
-    place_id = db.Column(db.String(36), db.ForeignKey("place.id"), nullable=False)
-    user_id = db.Column(db.String(36), db.ForeignKey("user.id"), nullable=False)
-    comment = db.Column(db.String(420), nullable=False)
-    ratng = db.Column(db.Float(), nullable=False)
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
+    id = Column(String(36), primary_key=True)
+    place_id = Column(String(36), ForeignKey("place.id"), nullable=False)
+    user_id = Column(String(36), ForeignKey("user.id"), nullable=False)
+    comment = Column(String(420), nullable=False)
+    ratng = Column(Float(), nullable=False)
+    created_at = Column(DateTime, default=func.current_timestamp())
+    updated_at = Column(DateTime, onupdate=func.current_timestamp())
 
     def __init__(
         self, place_id: str, user_id: str, comment: str, rating: float, **kw

@@ -6,7 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt as bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from src.models.user import User
-
+from src.persistence.__init__ import repo
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 cors = CORS()
 
 
@@ -17,11 +19,11 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     """
     app = Flask(__name__)
     app.url_map.strict_slashes = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///development.db'
-    db = SQLAlchemy(app)
-
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqldb://root:5210@localhost/hbnb_db'
+    engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+    Session = sessionmaker(bind=engine)
+    app.db = Session()
     app.config.from_object(config_class)
-
     register_extensions(app)
     register_routes(app)
     register_handlers(app)

@@ -2,20 +2,25 @@
 User related functionality
 """
 
-import uuid
+import os
 from src.models.base import Base
 from sqlalchemy import Column, String, Boolean, DateTime, func
 from flask_bcrypt import Bcrypt as bcrypt
 
+if os.getenv("REPOSITORY_ENV_VAR") == "db":
+    from src.persistence.db import DBRepository
+    repo = DBRepository
+else:
+    repo = Base
 
-class User(Base):
+class User(repo):
     """User representation"""
 
     email: str
     first_name: str
     last_name: str
     
-    __tablename__ = "Users"
+    __tablename__ = "User"
     
     id = Column(String(36), primary_key=True)
     email = Column(String(120), unique=True, nullable=False)
@@ -60,7 +65,7 @@ class User(Base):
         """Create a new user"""
         from src.persistence import repo
 
-        users: list["User"] = User.get_all()
+        users: list["User"] = User.get_all(self="User", model_name="User")
 
         for u in users:
             if u.email == user["email"]:

@@ -1,5 +1,6 @@
 """ Abstract base class for all models """
 
+from sqlalchemy.sql import text
 from datetime import datetime
 from typing import Any, Optional
 import uuid
@@ -60,7 +61,7 @@ class Base(ABC):
         """
         from src.persistence import repo
 
-        return repo.get_all(cls.__name__.lower())
+        return repo.get_all(text(cls.__name__))
 
     @classmethod
     def delete(cls, id) -> bool:

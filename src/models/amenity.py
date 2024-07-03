@@ -1,11 +1,15 @@
 """
 Amenity related functionality
 """
-
+import os
 from src.models.base import Base
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, String, DateTime, ForeignKey, func
 
-db = SQLAlchemy()
+if os.getenv("REPOSITORY_ENV_VAR") == "db":
+    from src.persistence.db import DBRepository
+    repo = DBRepository
+else:
+    repo = Base
 
 class Amenity(Base):
     """Amenity representation"""
@@ -14,10 +18,10 @@ class Amenity(Base):
 
     __tablename__ = "Amenities"
     
-    id = db.Column(db.String(36), primary_key=True, nullable=False)
-    name = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
+    id = Column(String(36), primary_key=True, nullable=False)
+    name = Column(String(256), nullable=False)
+    created_at = Column(DateTime, default=func.current_timestamp())
+    updated_at = Column(DateTime, onupdate=func.current_timestamp())
     
     def __init__(self, name: str, **kw) -> None:
         """Dummy init"""
@@ -75,11 +79,11 @@ class PlaceAmenity(Base):
 
     __tablename__ = "PlaceAmenities"
     
-    id = db.Column(db.String(36), primary_key=True, nullable=False)
-    place_id = db.Column(db.String(36), db.ForeignKey("place.id"), nullable=False)
-    amenity_id = db.Column(db.String(36), db.ForeignKey("amenity.id"), nullable=False)
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
+    id = Column(String(36), primary_key=True, nullable=False)
+    place_id = Column(String(36), ForeignKey("place.id"), nullable=False)
+    amenity_id = Column(String(36), ForeignKey("amenity.id"), nullable=False)
+    created_at = Column(DateTime, default=func.current_timestamp())
+    updated_at = Column(DateTime, onupdate=func.current_timestamp())
     
     def __init__(self, place_id: str, amenity_id: str, **kw) -> None:
         """Dummy init"""

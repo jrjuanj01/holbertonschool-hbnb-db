@@ -2,21 +2,24 @@
 to be used based on the environment variable REPOSITORY_ENV_VAR."""
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from src.persistence.repository import Repository
-from utils.constants import REPOSITORY_ENV_VAR
+# from utils.constants import REPOSITORY_ENV_VAR
 
 repo: Repository
 
-if os.getenv(key=REPOSITORY_ENV_VAR) == "db":
+if os.getenv("REPOSITORY_ENV_VAR") == "db":
     from src.persistence.db import DBRepository
 
     repo = DBRepository()
-elif os.getenv(REPOSITORY_ENV_VAR) == "file":
+elif os.getenv("REPOSITORY_ENV_VAR") == "file":
     from src.persistence.file import FileRepository
 
     repo = FileRepository()
-elif os.getenv(REPOSITORY_ENV_VAR) == "pickle":
+elif os.getenv("REPOSITORY_ENV_VAR") == "pickle":
     from src.persistence.pickled import PickleRepository
 
     repo = PickleRepository()
