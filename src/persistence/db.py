@@ -17,14 +17,13 @@ from datetime import datetime
 from typing import Optional
 import uuid
 from src.persistence.repository import Repository
-from sqlalchemy import text
 from flask import current_app as app
+from sqlalchemy.orm import Session
 
 
 class DBRepository(Repository):
     """Dummy DB repository"""
 
-    
     def __init__(
         self,
         id: Optional[str] = None,
@@ -45,48 +44,37 @@ class DBRepository(Repository):
         self.created_at = created_at or datetime.now()
         self.updated_at = updated_at or datetime.now()
         
-        # self.useData = app.config['SQLALCHEMY_DATABASE_URI']
-
-    def get_all(self, model_name: str) -> list:
+    def get_all(self, model):
         """Gets all values of a given model"""
-        # if self.useData:
-        return app.db.query(text(model_name)).all()
-        # else:
-            # return []
+        session: Session = app.db
+        return session.query(model).all()
 
-    def get(self, model_name: str, obj_id: str) -> Base | None:
-        """Retrieves the data of a given model with it's ID"""
-        if self.useData:
-            return app.db.session.query(model_name).filter_by(id=obj_id).first()
-        else:
-            return None
-
+    def get(self, model, obj_id: str) -> Base | None:
+        """Retrieves the data of a given model with its ID"""
+        session: Session = app.db
+        return session.query(model).filter_by(id=obj_id).first()
 
     def save(self, obj: Base) -> None:
-        """Saves an instance of a given model """
-        if self.useData:
-            app.db.session.add(obj)
-            app.db.session.commit()
-        else:
-            pass
+        """Saves an instance of a given model"""
+        session: Session = app.db
+        session.add(obj)
+        session.commit()
+
+    def update(self, obj: Base) -> Base | None:
+        """Updates the data of a given model instance"""
+        session: Session = app.db
+        session.add(obj)
+        session.commit()
+        return obj
+
+    def delete(self, obj: Base) -> bool:
+        """Deletes the data of a given model instance"""
+        session: Session = app.db
+        session.delete(obj)
+        session.commit()
+        return True
+
+    
     def reload(self) -> None:
         """Not implemented"""
         pass
-    
-    def update(self, obj: Base) -> Base | None:
-        """Updates the data of a given model instance"""
-        if self.useData:
-            app.db.session.add(obj)
-            app.db.session.commit()
-            return obj
-        else:
-            return None
-        
-    def delete(self, obj: Base) -> bool:
-        """Deletes the data of a given model instance"""
-        if self.useData:
-            app.db.session.delete(obj)
-            app.db.session.commit()
-            return True
-        else:
-            return False

@@ -9,18 +9,14 @@ from flask_bcrypt import Bcrypt as bcrypt
 
 if os.getenv("REPOSITORY_ENV_VAR") == "db":
     from src.persistence.db import DBRepository
-    repo = DBRepository
+    repo = DBRepository()
 else:
     repo = Base
 
-class User(repo):
+class User(Base):
     """User representation"""
 
-    email: str
-    first_name: str
-    last_name: str
-    
-    __tablename__ = "User"
+    __tablename__ = "User"  # Ensure this matches your actual table name
     
     id = Column(String(36), primary_key=True)
     email = Column(String(120), unique=True, nullable=False)
@@ -32,15 +28,14 @@ class User(repo):
     updated_at = Column(DateTime, onupdate=func.current_timestamp())
 
     def __init__(self, email: str, first_name: str, last_name: str, **kw):
-        """Dummy init"""
+        """Initialize the user"""
         super().__init__(**kw)
-
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
 
     def __repr__(self) -> str:
-        """Dummy repr"""
+        """Representation of the user"""
         return f"<User {self.id} ({self.email})>"
 
     def to_dict(self) -> dict:
@@ -61,17 +56,20 @@ class User(repo):
         return bcrypt.check_password_hash(self.password_hash, password)
 
     @staticmethod
-    def create(user: dict) -> "User":
+    def create(user_data: dict) -> "User":
         """Create a new user"""
-        from src.persistence import repo
+        # users: list["User"] = repo.get_all(User)
 
-        users: list["User"] = User.get_all(self="User", model_name="User")
+        # for u in users:
+        #     if u.email == user_data["email"]:
+        #         raise ValueError("User already exists")
 
-        for u in users:
-            if u.email == user["email"]:
-                raise ValueError("User already exists")
-
-        new_user = User(**user)
+        new_user = User(
+            email=user_data["email"],
+            first_name=user_data["first_name"],
+            last_name=user_data["last_name"],
+            password_hash=bcrypt().generate_password_hash(user_data["password"]).decode('utf-8')
+        )
 
         repo.save(new_user)
 
@@ -80,9 +78,7 @@ class User(repo):
     @staticmethod
     def update(user_id: str, data: dict) -> "User | None":
         """Update an existing user"""
-        from src.persistence import repo
-
-        user: User | None = User.get(user_id)
+        user: User | None = repo.get(User, user_id)
 
         if not user:
             return None
@@ -93,6 +89,8 @@ class User(repo):
             user.first_name = data["first_name"]
         if "last_name" in data:
             user.last_name = data["last_name"]
+        if "password" in data:
+            user.password_hash = bcrypt.generate_password_hash(data["password"]).decode('utf-8')
 
         repo.update(user)
 
